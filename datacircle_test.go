@@ -37,7 +37,15 @@ func TestDefinitions(t *testing.T) {
 		if name == SearchPlansName && !strings.Contains(string(sent), `"enum":["score","provider","price"]`) {
 			t.Errorf("%s's sort has no enum: %s", name, sent)
 		}
-		if !strings.Contains(string(sent), `"tools":[{"type":"function","function":{"name":"`+name+`","description":"`) ||
+		// Read as JSON: go-openai v1.42.0 and later write a tool's keys in another order.
+		var req struct {
+			Tools []struct {
+				Type     string `json:"type"`
+				Function struct{ Name, Description string }
+			}
+		}
+		if json.Unmarshal(sent, &req) != nil || len(req.Tools) != 1 || req.Tools[0].Type != "function" ||
+			req.Tools[0].Function.Name != name || req.Tools[0].Function.Description != abouts[name] ||
 			!strings.Contains(string(sent), `"limit":{"description":"How many`) ||
 			!strings.Contains(string(sent), `"parameters":{"properties":{`) || !strings.Contains(string(sent), `"type":"object"`) {
 			t.Errorf("%s's definition: %s", name, sent)

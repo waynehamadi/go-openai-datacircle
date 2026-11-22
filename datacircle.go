@@ -23,7 +23,7 @@ import (
 const BaseURL = "https://api.datacircle.dev/v1"
 
 // Version is this module's version, sent in each call's User-Agent.
-const Version = "0.1.0"
+const Version = "0.1.1"
 
 // Config sets where the tools call. Its zero value, or nil, calls BaseURL with http.DefaultClient.
 type Config struct {
